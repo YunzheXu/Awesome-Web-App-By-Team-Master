@@ -8,6 +8,7 @@ Yunzhe Xu, Shaohua Shang, Yeliang Yang
 
 ## Let's start!!
 ## Enjoy!
+## Have fun
 
 ## Course Technologies used
 
