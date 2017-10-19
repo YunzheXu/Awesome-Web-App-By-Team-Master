@@ -2,11 +2,12 @@
 
 ## Group Member
 
-Yunzhe Xu, Shaohua Shang, Yieliang Yang
+Yunzhe Xu, Shaohua Shang, Yeliang Yang
 
 ## Course Technologies used
 
 React, Redis(We chose now)
+
 The applicable technologies are:
 ◦Electron
 ◦React
@@ -20,6 +21,7 @@ The applicable technologies are:
 ## Independent Technologies
 
 Some ideas:
+
 ◦A messaging queue for IPC in place of Redis(i.e., RabbitMQ)
 ◦An image manipulation software (i.e., ImageMagick)
 ◦Advanced full text indexing databases (i.e., ElasticSearch)
