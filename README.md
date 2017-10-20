@@ -1,10 +1,9 @@
 # CS 554 Final Project
-
+## Team Master
 ## Group Member
 
 Yunzhe Xu, Shaohua Shang, Yeliang Yang
-## Welcome to Drink Soup project, For this project, we will introduce people how to 
-## select a good soup and how to drink soup profesionally.
+## Welcome to Team Master project!
 
 ## Let's start!!
 ## Enjoy!
