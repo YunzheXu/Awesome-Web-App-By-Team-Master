@@ -1,0 +1,23 @@
+.img{
+    transition: transform 0.25s ease;
+    width: 256px;
+    height: 144px;
+    border-radius:8px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+  
+  
+  .img:hover {
+    transform: scale(1.2);
+    -ms-transform: scale(1.2);
+    -webkit-transform: scale(1.2);
+    -moz-transform: scale(1.2);
+  }
+
+.cover {
+  margin-bottom: 20px;
+  margin-top: -20px;
+  width: 100%;
+}
+
+
