@@ -4,7 +4,7 @@ import './App.css';
 import './myCss.css'
 import axios from "axios";
 import {  
-Nav, Navbar, NavItem, NavDropdown, MenuItem,
+Nav, Navbar, NavItem, NavDropdown, MenuItem, Grid,
 } from 'react-bootstrap'
 
 class App extends Component {
@@ -50,12 +50,10 @@ class App extends Component {
       
       return (
 
-        <div className="col-sm-6 col-md-2">
-
+        <div className="col-sm-6 col-md-3">
+          <h4 class='text'>{hero.id} </h4>
           {picture}
-          <h3>{hero.localized_name}</h3>  
-          <p><b>#{hero.id}</b></p>  
-
+          <h3 class='text'>{hero.localized_name}</h3>  
         </div>
       );
             
@@ -67,7 +65,7 @@ class App extends Component {
           <Navbar inverse collapseOnSelect>
             <Navbar.Header>
               <Navbar.Brand>
-              <a href="#"><img src='http://cdn.dota2.com/apps/dota2/images/nav/logo.png'  alt="logo" /></a>
+              <a href="#"><img src='http://cdn.dota2.com/apps/dota2/images/nav/logo.png'  alt="logo" height='20px'/></a>
               </Navbar.Brand>
               <Navbar.Toggle />
             </Navbar.Header>
@@ -83,13 +81,17 @@ class App extends Component {
           
         </header>
 
+
         <div class='cover'>
           <img src='http://cdn.dota2.com/apps/dota2/images/blogfiles/bg_five_heroes.jpg' alt='cover' width='100%'/> 
+          <div class="centered">Dota2 Heroes Guide</div>
         </div>
+        <Grid>
+          <div>
+            {heroDisplays}
+          </div>
+        </Grid>
 
-        <div>
-          {heroDisplays}
-        </div>
 
       </div>
     );
