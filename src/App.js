@@ -1,12 +1,72 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import './myCss.css'
-import axios from "axios";
-import {  
-Nav, Navbar, NavItem, NavDropdown, MenuItem, Grid,
-} from 'react-bootstrap'
+import React, { Component } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Switch,
+  Redirect
+} from "react-router-dom";
+import {
+  Grid, Row, Col, Nav, Navbar, NavItem
+} from "react-bootstrap"
+import "./App.css";
+import Heroes from "./Heroes";
 
+
+
+class App extends Component {
+
+
+  render() {
+       // alert("Hello -- ");     
+    return (
+      <Router>
+        <div className="App">
+        <header>
+          <Navbar inverse collapseOnSelect>
+            <Navbar.Header>
+              <Navbar.Brand>
+              <a href="/"><img src='http://cdn.dota2.com/apps/dota2/images/nav/logo.png'  alt="logo" height='20px'/></a>
+              </Navbar.Brand>
+              <Navbar.Toggle />
+            </Navbar.Header>
+            <Navbar.Collapse>
+              <Nav pullRight>
+                <NavItem eventKey={1} href="#">Sign in</NavItem>
+                <NavItem eventKey={2} href="#">Sign up</NavItem>
+              </Nav>
+            </Navbar.Collapse>
+          </Navbar>
+        </header>
+
+          <Link to={`/`}>Home</Link>
+          <Link to={`/heroes/`}>Heroes</Link>
+   
+
+
+          <div className="App-body">
+            
+            <Switch>
+              <Route path="/heroes" component={Heroes} />
+            </Switch>
+          </div>
+          <footer>
+            Enjoy it!
+          </footer>
+        </div>
+      </Router>
+    );
+  }
+}
+
+
+
+export default App;
+
+
+/**
+ * 
+ * 
 class App extends Component {
     
   constructor(props) {
@@ -97,5 +157,4 @@ class App extends Component {
     );
   }
 }
-
-export default App;
+ */

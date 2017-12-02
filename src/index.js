@@ -7,5 +7,5 @@ import Bootstrap from 'bootstrap/dist/css/bootstrap.css'
 
 const title = "Dota2";
 
-ReactDOM.render(<App title = {title} author = "Shaohua" now = {new Date()}/>, document.getElementById('root'));
+ReactDOM.render(<App title = {title} author = "Yunzhe Xu/Shaohua Shang/Yeliang Yang" now = {new Date()}/>, document.getElementById('root'));
 registerServiceWorker();
