@@ -4,10 +4,11 @@ import {
   Route,
   Link,
   Switch,
-  Redirect
+  Redirect,
+  NavLink
 } from "react-router-dom";
 import {
-  Grid, Row, Col, Nav, Navbar, NavItem
+  Grid, Row, Col, Nav, Navbar, NavItem, Button
 } from "react-bootstrap"
 import "./App.css";
 import Heroes from "./Heroes";
@@ -16,6 +17,32 @@ import Heroes from "./Heroes";
 
 class App extends Component {
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showSignInModal: false,
+      showSingUpModal: false,
+    };
+  }  
+  /*
+  //sign in
+  openSignIn() {
+    this.setState({showSignInModal: true});
+  }
+
+  closeSignIn() {
+    this.setState({showSignInModal: false});
+  }
+
+  //sign up
+  openSignUp() {
+    this.setState({showSignUpModal: true});
+  }
+
+  closeSignUp() {
+    this.setState({showSignUpModal: false});
+  }*/
 
   render() {
        // alert("Hello -- ");     
@@ -32,20 +59,21 @@ class App extends Component {
             </Navbar.Header>
             <Navbar.Collapse>
               <Nav pullRight>
-                <NavItem eventKey={1} href="#">Sign in</NavItem>
-                <NavItem eventKey={2} href="#">Sign up</NavItem>
+                <NavItem eventKey={1} href="#" onClick={this.openSignIn}>Sign in</NavItem>
+                <NavItem eventKey={2} href="#" onClick={this.openSignUp}>Sign up</NavItem>
               </Nav>
             </Navbar.Collapse>
           </Navbar>
         </header>
-
-          <Link to={`/`}>Home</Link>
-          <Link to={`/heroes/`}>Heroes</Link>
-   
-
-
+        <Grid>
+          <Row>
+            <div>
+            <NavLink to={`/`} className="nav-link">Home</NavLink>
+            <NavLink to={`/heroes/`} className="nav-link">Heroes</NavLink>
+            </div>
+          </Row>
+        </Grid>
           <div className="App-body">
-            
             <Switch>
               <Route path="/heroes" component={Heroes} />
             </Switch>

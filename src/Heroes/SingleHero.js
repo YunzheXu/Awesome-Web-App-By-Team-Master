@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Link, Switch, Redirect } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
-import {ListGroup, ListGroupItem, Grid, Row, Col, Button, FormGroup, FormControl, ControlLabel} from "react-bootstrap"
+import {ListGroup, ListGroupItem, Grid, Row, Col, Button, FormGroup, FormControl, ControlLabel, Panel} from "react-bootstrap"
 import "./singleHero.css"
 import ReactHighcharts from 'react-highcharts';
 import HighchartsMore from 'highcharts-more';
