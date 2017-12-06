@@ -3,7 +3,63 @@ import { BrowserRouter as Router, Route, Link, Switch, Redirect } from "react-ro
 import axiosInstance from "../utils/axiosInstance";
 import {ListGroup, ListGroupItem, Grid, Row, Col, Button, FormGroup, FormControl, ControlLabel} from "react-bootstrap"
 import "./singleHero.css"
+import ReactHighcharts from 'react-highcharts';
+import HighchartsMore from 'highcharts-more';
+HighchartsMore(ReactHighcharts.Highcharts);
 
+function getHero(heroes, id) {
+  return new Promise ((fulfill, reject) => {
+    var index;
+    heroes.forEach(function(element) {
+      if (element.id === id) {
+        index = heroes.indexOf(element);
+      }
+    });
+    fulfill(heroes[index]);
+  });
+}
+
+function getWinrateData(hero) {
+  return new Promise ((fulfill, reject) => {
+    var chartdata = [];
+    for (let rank = 1; rank <= 7; rank++) {
+      let win = rank.toString() + "_win";
+      let pick = rank.toString() + "_pick";
+      let winrate = (hero[win] / hero[pick]);
+      winrate = parseFloat((winrate * 100).toFixed(2));
+      chartdata.push(winrate);
+    }
+    fulfill(chartdata);
+  });
+}
+
+function getStatData(hero) {
+  return new Promise ((fufill, reject) => {
+    var chartdata = [
+      hero.base_mana / 3,
+      (hero.base_attack_max + hero.base_attack_min) / 2,
+      hero.base_int,
+      hero.base_agi,
+      hero.base_str,
+      hero.base_health / 10
+    ];
+    fufill(chartdata);
+  });
+}
+
+function getOtherStatData(hero) {
+  return new Promise((fufill, reject) => {
+    var chartdata = [
+      hero.base_mana_regen,
+      hero.attack_rate,
+      hero.agi_gain,
+      hero.str_gain,
+      hero.int_gain,
+      hero.base_health_regen
+    ];
+    fufill(chartdata);
+  });
+}
 
 class SingleHero extends Component {
   constructor(props) {
@@ -12,10 +68,12 @@ class SingleHero extends Component {
     this.state = {
       hero: undefined,
       loading: false,
-      error: false
+      error: false,
+      winrateChart: {},
+      statChart: {}
     };
   }
-
+  
   async loadHeroById(heroId) {
     try {
       this.setState({ loading: true });
@@ -23,17 +81,90 @@ class SingleHero extends Component {
       const response = await axiosInstance.get(url);
       var heroes = response.data;
       var id = parseInt(heroId);
-      var index;
-      (async function getIndex() {
-        heroes.forEach(function(element) {
-          if (element.id === id) {
-            index = heroes.indexOf(element);
-          }
-        });
-      })();
+     
+      var hero = await getHero(heroes, id);
+      var winrateData = await getWinrateData(hero);
+      var statData = await getStatData(hero);
+      //var otherStatData = await getOtherStatData(hero);
+      
+      this.setState({ loading: false, 
+                      hero, 
+                      error: false,
+                      winrateChart: {
+                        chart: {
+                            type: 'line'
+                        },
+                        title: {
+                            text: 'Winrate based on Rank Points'
+                        },
+                        subtitle: {
+                            text: 'Datasource: opendota.com'
+                        },
+                        xAxis: {
+                            categories: ['1000','2000','3000','4000','5000','6000','7000']
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Winrate(%)'
+                            }
+                        },
+                        plotOptions: {
+                            line: {
+                                dataLabels: {
+                                    enabled: true          
+                                },
+                            }
+                        },
+                        series: [{
+                            name: 'Winrate',
+                            data: winrateData
+                        }],
+                        credits:{
+                          enabled: false         
+                        }
+                      },
 
-      var hero = heroes[index];
-      this.setState({ loading: false, hero, error: false});
+                      statChart: {
+                        chart: {
+                          polar: true,
+                          type: 'line'
+                        },
+                        title: {
+                            text: 'Hero Stat'
+                        },
+                        subtitle: {
+                          text: 'Datasource: opendota.com'
+                        },
+                        pane: {
+                            size: '80%'
+                        },
+                        xAxis: {
+                            categories: ['Mana(1/3)', 'Avg Attack', 'Int', 'Agi',
+                                        'Str', 'Health(1/10)'],
+                            tickmarkPlacement: 'on',
+                            lineWidth: 0
+                        },
+                        yAxis: {
+                            gridLineInterpolation: 'polygon',
+                            lineWidth: 0,
+                            min: 0
+                        },
+                        legend: {
+                            align: 'right',
+                            verticalAlign: 'top',
+                            y: 70,
+                            layout: 'vertical'
+                        },
+                        series: [{
+                            name: 'Base Stat',
+                            data: statData,
+                            pointPlacement: 'on'
+                          }],
+                        credits:{
+                          enabled: false         
+                        }
+                      }
+                    }); 
     } catch (e) {
       this.setState({ 
         loading: false ,
@@ -58,7 +189,6 @@ class SingleHero extends Component {
 
   render() {
     let body = null;
-    let chart = null;
    // alert(this.state.error );
     if (this.state.error === true) {
       return <Redirect to="/error/" />
@@ -69,16 +199,6 @@ class SingleHero extends Component {
     } else if (this.state.hero) {
       const url = this.props.match.url;
       const hero = this.state.hero;
-      var chartdata = [['Rank', 'Winrate(%)']];
-      for (let rank = 1000; rank <= 5000; rank += 1000) {
-        let win = rank.toString() + "_win";
-        let pick = rank.toString() + "_pick";
-        let winrate = (hero[win] / hero[pick]);
-        winrate = parseFloat((winrate * 100).toFixed(2));
-        chartdata.push([rank, winrate]);
-      }
-     
-
 
       body = (
         <div>
@@ -99,65 +219,39 @@ class SingleHero extends Component {
                               </Row>
 
                               <Row>
-                                <div className="menu-header">
-                                  <h2>Stat</h2>
-                                </div>
-                              </Row>
-
-                              <Row>
-                                <div className="content">
+                                <Col sm={12} md={6}>
                                   <Row>
-                                    <Col xs={12} md={3} >
-                                      <ul>
-                                        <li>base health: {hero.base_health}</li>
-                                        <li>base health regen: {hero.base_health_regen}</li>
-                                        <li>base mana: {hero.base_mana}</li>
-                                        <li>base mana regen: {hero.base_mana_regen}</li>
-                                      </ul>
-                                    </Col>
-                                    <Col xs={12} md={3} >
-                                      <ul>
-                                        <li>base armor: {hero.base_armor}</li>
-                                        <li>base mr: {hero.base_mr}</li>
-                                        <li>base attack min: {hero.base_attack_min}</li>
-                                        <li>base attack max: {hero.base_attack_max}</li>
-                                      </ul>
-                                    </Col>
+                                    <div className="menu-header">
+                                      <h2>Stat</h2>
+                                    </div>
                                   </Row>
-                                </div>
-                              </Row>
-
-                              <Row>
-                                <div className="menu-header">
-                                  <h2>Winrate</h2>
-                                </div>
-                              </Row>
-
-                              <Row>
-                                <div className="content">
                                   <Row>
-                                    <Col xs={12} md={3} >
-                                      <ul>
-                                        <li>2000 pick: {hero['2000_pick']}</li>
-                                        <li>2000 win: {hero['2000_win']}</li>
-                                        <li>3000 pick: {hero['3000_pick']}</li>
-                                        <li>3000 win: {hero['3000_win']}</li>
-                                      </ul>
-                                    </Col>
-                                    <Col xs={12} md={3} >
-                                      <ul>
-                                        <li>4000 pick: {hero['4000_pick']}</li>
-                                        <li>4000 win: {hero['4000_win']}</li>
-                                        <li>5000 pick: {hero['5000_pick']}</li>
-                                        <li>5000 win: {hero['5000_win']}</li>
-                                      </ul>
-                                    </Col>
-                                    <Col xs={12} md={3} >
-                                      
-                                    </Col>
+                                    <div className="content">
+                                      <div style={{width: '100%', padding: '20px '}}>
+                                        <ReactHighcharts config={this.state.statChart}></ReactHighcharts>
+                                      </div>
+                                    </div>
                                   </Row>
-                                </div>
+                                </Col>
+                                <Col sm={12} md={6}>
+                                  <Row>
+                                    <div className="menu-header">
+                                      <h2>Winrate</h2>
+                                    </div>
+                                  </Row>
+                                  <Row>
+                                    <div className="content">
+                                      <div style={{width: '100%', padding: '20px '}}>
+                                        <ReactHighcharts config={this.state.winrateChart}></ReactHighcharts>
+                                      </div>
+                                    </div>
+                                  </Row>
+                                </Col>
                               </Row>
+
+
+
+                             
 
                               <Row>
                                 <div className="menu-header">
@@ -209,3 +303,4 @@ class SingleHero extends Component {
 }
 
 export default SingleHero;
+
