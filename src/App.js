@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap"
 import "./App.css";
 import Heroes from "./Heroes";
-
+import SignUp from "./SignUp";
 
 
 class App extends Component {
@@ -33,7 +33,7 @@ class App extends Component {
 
   closeSignIn() {
     this.setState({showSignInModal: false});
-  }
+  }*/
 
   //sign up
   openSignUp() {
@@ -42,7 +42,7 @@ class App extends Component {
 
   closeSignUp() {
     this.setState({showSignUpModal: false});
-  }*/
+  }
 
   render() {
        // alert("Hello -- ");     
@@ -60,7 +60,7 @@ class App extends Component {
             <Navbar.Collapse>
               <Nav pullRight>
                 <NavItem eventKey={1} href="#" onClick={this.openSignIn}>Sign in</NavItem>
-                <NavItem eventKey={2} href="#" onClick={this.openSignUp}>Sign up</NavItem>
+                <NavItem eventKey={2} href="/Sign-up" onClick={this.openSignUp}>Sign up</NavItem>
               </Nav>
             </Navbar.Collapse>
           </Navbar>
@@ -76,6 +76,7 @@ class App extends Component {
           <div className="App-body">
             <Switch>
               <Route path="/heroes" component={Heroes} />
+              <Route path="/Sign-up" component={SignUp}/>
             </Switch>
           </div>
           <footer>
