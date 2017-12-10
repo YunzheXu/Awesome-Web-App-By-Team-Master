@@ -1,11 +1,14 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Link, Switch, Redirect } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
+import guideAPI from "../utils/guideAPI";
+
 import {ListGroup, ListGroupItem, Grid, Row, Col, Button, FormGroup, FormControl, ControlLabel, Panel} from "react-bootstrap"
 import "./singleHero.css"
 import ReactHighcharts from 'react-highcharts';
 import HighchartsMore from 'highcharts-more';
 HighchartsMore(ReactHighcharts.Highcharts);
+
 
 function getHero(heroes, id) {
   return new Promise ((fulfill, reject) => {
@@ -70,7 +73,10 @@ class SingleHero extends Component {
       loading: false,
       error: false,
       winrateChart: {},
-      statChart: {}
+      statChart: {},
+      guideTitle: undefined,
+      guideContent: undefined,
+      guideList: undefined,
     };
   }
   
@@ -176,6 +182,10 @@ class SingleHero extends Component {
   async componentDidMount() {
     const heroId = this.props.match.params.id;
     await this.loadHeroById(heroId);
+    let guides = await guideAPI.getGuideByHeroId(heroId);
+    //alert(guides.guide[0].title);
+    this.setState({ guideList: guides });
+    alert(this.state.guideList.guide[0].title);
   }
 
   async componentWillReceiveProps(nextProps) {
@@ -185,6 +195,14 @@ class SingleHero extends Component {
     if (heroId !== oldHeroId) {
       await this.loadHeroById(heroId);
     }
+  }
+
+  async submitGuideForm(id, title, content) {
+    alert(`heroId: ${id}`);
+    alert(`guideTitle: ${title}`);
+    alert(`guideContent: ${content}`);
+    guideAPI.store(id, title, content);
+    //guideAPI.guideInit();
   }
 
   render() {
@@ -199,6 +217,22 @@ class SingleHero extends Component {
     } else if (this.state.hero) {
       const url = this.props.match.url;
       const hero = this.state.hero;
+
+      /*let guideDisplay = this.state.guideList.guide.map((guide) => {
+        const title = (
+          <ul>
+            <li><b>Title:</b> {guide.title}</li>
+          </ul>
+        );
+
+        const content = (
+          <p>{guide.content}</p>
+        );
+        return (<section>
+          <div>{title}</div>
+          <div>{content}</div>
+        </section>);
+      });*/
 
       body = (
         <div>
@@ -249,9 +283,43 @@ class SingleHero extends Component {
                                 </Col>
                               </Row>
 
-
-
-                             
+                              
+                              <Row>
+                                <div className="guide-writting">
+                                  <form onSubmit={e => {
+                                    e.preventDefault();
+                                    this.submitGuideForm(this.props.match.params.id, this.state.guideTitle, this.state.guideContent);
+                                    this.setState({guideTitle: "", guideContent: ""});
+                                  }}>
+                                    <FormGroup >
+                                      <ControlLabel>Hero Guide Title</ControlLabel>
+                                      <FormControl 
+                                      type="text" 
+                                      placeholder="Your guide's title" 
+                                      onChange={e => {
+                                        e.preventDefault();
+                                        this.setState({ guideTitle: e.target.value });
+                                      }} 
+                                      value={this.state.guideTitle}/>
+                                    </FormGroup>
+                                    <FormGroup controlId="formControlsTextarea" >
+                                      <ControlLabel>Hero Guide Content</ControlLabel>
+                                      <FormControl 
+                                      style={{height: '200px'}} 
+                                      componentClass="textarea" 
+                                      placeholder="Write your guide here!" 
+                                      onChange={e => {
+                                        e.preventDefault();
+                                        this.setState({ guideContent: e.target.value });
+                                      }} 
+                                      value={this.state.guideContent}/>
+                                    </FormGroup>
+                                    <Button type="submit">
+                                      Submit
+                                    </Button>
+                                  </form>
+                                </div>
+                              </Row>
 
                               <Row>
                                 <div className="menu-header">
@@ -262,29 +330,10 @@ class SingleHero extends Component {
                               <Row>
                                 <div className="content">
                                   <ul>
-                                    <li><a>Guide1</a></li>
-                                    <li><a>Guide2</a></li>
-                                    <li><a>Guide3</a></li>
-                                    <li><a>Guide4</a></li>
+                                    <li>
+                                      
+                                      </li>
                                   </ul>
-                                </div>
-                              </Row>
-                              
-                              <Row>
-                                <div className="guide-writting">
-                                  <form>
-                                    <FormGroup >
-                                      <ControlLabel>Hero Guide Title</ControlLabel>
-                                      <FormControl type="text" placeholder="Your guide's title" />
-                                    </FormGroup>
-                                    <FormGroup controlId="formControlsTextarea" >
-                                      <ControlLabel>Hero Guide Content</ControlLabel>
-                                      <FormControl style={{height: '200px'}} componentClass="textarea" placeholder="Write your guide here!" />
-                                    </FormGroup>
-                                    <Button type="submit">
-                                      Submit
-                                    </Button>
-                                  </form>
                                 </div>
                               </Row>
                             </Grid>
