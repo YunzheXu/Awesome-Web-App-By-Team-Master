@@ -1,5 +1,4 @@
 import axios from "axios";
-import qs from "qs";
 
 //const cors = "https://cors-anywhere.herokuapp.com/";
 const apiRoot = "https://api.opendota.com/api/";

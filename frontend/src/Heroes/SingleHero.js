@@ -1,14 +1,14 @@
 import React, { Component } from "react";
+
 import { BrowserRouter as Router, Route, Link, Switch, Redirect } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
-import guideAPI from "../utils/guideAPI";
+import obj from "../utils/guideAPI";
 
 import {ListGroup, ListGroupItem, Grid, Row, Col, Button, FormGroup, FormControl, ControlLabel, Panel} from "react-bootstrap"
 import "./singleHero.css"
 import ReactHighcharts from 'react-highcharts';
 import HighchartsMore from 'highcharts-more';
 HighchartsMore(ReactHighcharts.Highcharts);
-
 
 function getHero(heroes, id) {
   return new Promise ((fulfill, reject) => {
@@ -50,20 +50,6 @@ function getStatData(hero) {
   });
 }
 
-function getOtherStatData(hero) {
-  return new Promise((fufill, reject) => {
-    var chartdata = [
-      hero.base_mana_regen,
-      hero.attack_rate,
-      hero.agi_gain,
-      hero.str_gain,
-      hero.int_gain,
-      hero.base_health_regen
-    ];
-    fufill(chartdata);
-  });
-}
-
 class SingleHero extends Component {
   constructor(props) {
     super(props);
@@ -74,12 +60,39 @@ class SingleHero extends Component {
       error: false,
       winrateChart: {},
       statChart: {},
-      guideTitle: undefined,
-      guideContent: undefined,
-      guideList: undefined,
+      guideTitle:undefined,
+      guideContent:undefined,
+      guideList:undefined,
+      file: '',
+      imagePreviewUrl: ''
     };
+    this._handleImageChange = this._handleImageChange.bind(this);
+   
   }
-  
+
+
+  _handleImageChange(e) {
+    e.preventDefault();
+
+    let reader = new FileReader();
+    let file = e.target.files[0];
+
+    reader.onloadend = () => {
+      this.setState({
+        file: file,
+        imagePreviewUrl: reader.result
+      });
+    }
+
+    reader.readAsDataURL(file)
+  }
+
+
+  submitGuideForm(id,title,content,file){
+      obj.store(id,title,content,file);
+      this.componentDidMount();
+  }
+
   async loadHeroById(heroId) {
     try {
       this.setState({ loading: true });
@@ -91,8 +104,11 @@ class SingleHero extends Component {
       var hero = await getHero(heroes, id);
       var winrateData = await getWinrateData(hero);
       var statData = await getStatData(hero);
-      //var otherStatData = await getOtherStatData(hero);
       
+      let t=await obj.display(heroId);
+      this.setState({ guideList: t });
+
+
       this.setState({ loading: false, 
                       hero, 
                       error: false,
@@ -171,6 +187,7 @@ class SingleHero extends Component {
                         }
                       }
                     }); 
+          
     } catch (e) {
       this.setState({ 
         loading: false ,
@@ -182,10 +199,6 @@ class SingleHero extends Component {
   async componentDidMount() {
     const heroId = this.props.match.params.id;
     await this.loadHeroById(heroId);
-    let guides = await guideAPI.getGuideByHeroId(heroId);
-    //alert(guides.guide[0].title);
-    this.setState({ guideList: guides });
-    alert(this.state.guideList.guide[0].title);
   }
 
   async componentWillReceiveProps(nextProps) {
@@ -197,15 +210,15 @@ class SingleHero extends Component {
     }
   }
 
-  async submitGuideForm(id, title, content) {
-    alert(`heroId: ${id}`);
-    alert(`guideTitle: ${title}`);
-    alert(`guideContent: ${content}`);
-    guideAPI.store(id, title, content);
-    //guideAPI.guideInit();
-  }
-
   render() {
+    let {imagePreviewUrl} = this.state;
+    let $imagePreview = null;
+    if (imagePreviewUrl) {
+      $imagePreview = (<img src={imagePreviewUrl} />);
+    }
+
+
+
     let body = null;
    // alert(this.state.error );
     if (this.state.error === true) {
@@ -218,21 +231,27 @@ class SingleHero extends Component {
       const url = this.props.match.url;
       const hero = this.state.hero;
 
-      /*let guideDisplay = this.state.guideList.guide.map((guide) => {
-        const title = (
-          <ul>
-            <li><b>Title:</b> {guide.title}</li>
-          </ul>
+      let guidedisplay=this.state.guideList.guide.map((guide)=>{
+        let title=(
+          <p>Title:{guide.title}</p>
         );
+        let content=(
+          <p>Content:{guide.content}</p>
+        );
+        let image=(
+          <img src={guide.file} />
+        );
+        return (
+          <li>
+          <div>
+            {title}
+            {content}
+            {image}
+          </div>
+          </li>
+        );
+      });
 
-        const content = (
-          <p>{guide.content}</p>
-        );
-        return (<section>
-          <div>{title}</div>
-          <div>{content}</div>
-        </section>);
-      });*/
 
       body = (
         <div>
@@ -283,43 +302,9 @@ class SingleHero extends Component {
                                 </Col>
                               </Row>
 
-                              
-                              <Row>
-                                <div className="guide-writting">
-                                  <form onSubmit={e => {
-                                    e.preventDefault();
-                                    this.submitGuideForm(this.props.match.params.id, this.state.guideTitle, this.state.guideContent);
-                                    this.setState({guideTitle: "", guideContent: ""});
-                                  }}>
-                                    <FormGroup >
-                                      <ControlLabel>Hero Guide Title</ControlLabel>
-                                      <FormControl 
-                                      type="text" 
-                                      placeholder="Your guide's title" 
-                                      onChange={e => {
-                                        e.preventDefault();
-                                        this.setState({ guideTitle: e.target.value });
-                                      }} 
-                                      value={this.state.guideTitle}/>
-                                    </FormGroup>
-                                    <FormGroup controlId="formControlsTextarea" >
-                                      <ControlLabel>Hero Guide Content</ControlLabel>
-                                      <FormControl 
-                                      style={{height: '200px'}} 
-                                      componentClass="textarea" 
-                                      placeholder="Write your guide here!" 
-                                      onChange={e => {
-                                        e.preventDefault();
-                                        this.setState({ guideContent: e.target.value });
-                                      }} 
-                                      value={this.state.guideContent}/>
-                                    </FormGroup>
-                                    <Button type="submit">
-                                      Submit
-                                    </Button>
-                                  </form>
-                                </div>
-                              </Row>
+
+
+                             
 
                               <Row>
                                 <div className="menu-header">
@@ -329,11 +314,58 @@ class SingleHero extends Component {
 
                               <Row>
                                 <div className="content">
-                                  <ul>
-                                    <li>
-                                      
-                                      </li>
-                                  </ul>
+                                  <ol>
+                                     {guidedisplay}
+                                  </ol>
+                                </div>
+                              </Row>
+                              
+                              <Row>
+                                <div className="guide-writting">
+                                  <form
+                                  onSubmit={e => {
+                                    e.preventDefault();
+                                    this.submitGuideForm(this.props.match.params.id,this.state.guideTitle,this.state.guideContent,this.state.imagePreviewUrl);
+                                    this.setState({ guideTitle:"" });
+                                    this.setState({ guideContent:"" });
+                                    this.setState({ file:"" });
+                                    this.setState({ imagePreviewUrl:"" });
+                                  }}
+                                  >
+                                    <FormGroup >
+                                      <ControlLabel>Hero Guide Title</ControlLabel>
+                                      <FormControl type="text" placeholder="Your guide's title" 
+                                          onChange={e => {
+                                            e.preventDefault();
+                                            this.setState({ guideTitle:e.target.value });
+                                          }}
+                                        value={this.state.guideTitle}  
+                                        required              
+                                      />
+                                    </FormGroup>
+                                    <FormGroup controlId="formControlsTextarea" >
+                                      <ControlLabel>Hero Guide Content</ControlLabel>
+                                      <FormControl style={{height: '200px'}} componentClass="textarea" placeholder="Write your guide here!"
+                                      onChange={e => {
+                                        e.preventDefault();
+                                        this.setState({ guideContent:e.target.value });
+                                      }}
+                                      value={this.state.guideContent} 
+                                      required
+                                      />
+                                    </FormGroup>
+
+                                    <FormGroup>
+                                    <ControlLabel>Hero Guide Image</ControlLabel>
+                                    <FormControl type="file" onChange={this._handleImageChange} />
+                                    {$imagePreview}
+                                    </FormGroup>
+
+                                    <Button type="submit">
+                                      Submit
+                                    </Button>
+                                  </form>
+
                                 </div>
                               </Row>
                             </Grid>

@@ -2,18 +2,15 @@ import React, { Component } from "react";
 import {
   BrowserRouter as Router,
   Route,
-  Link,
   Switch,
-  Redirect,
   NavLink
 } from "react-router-dom";
 import {
-  Grid, Row, Col, Nav, Navbar, NavItem, Button
+  Grid, Row, Nav, Navbar, NavItem
 } from "react-bootstrap"
 import "./App.css";
 import Heroes from "./Heroes";
 import SignUp from "./SignUp";
-//import { Socket } from "net";
 
 
 class App extends Component {

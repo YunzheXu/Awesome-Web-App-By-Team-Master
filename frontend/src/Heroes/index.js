@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import HeroesPage from "./HeroesPage";
 import SingleHero from "./SingleHero";
-
 
 class Heroes extends Component {
 
