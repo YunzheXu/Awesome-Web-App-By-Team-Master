@@ -58,7 +58,6 @@ class SingleHero extends Component {
       hero: undefined,
       loading: false,
       error: false,
-      open: false,
       winrateChart: {},
       statChart: {},
       guideTitle:undefined,
@@ -231,7 +230,7 @@ class SingleHero extends Component {
     } else if (this.state.hero) {
       const url = this.props.match.url;
       const hero = this.state.hero;
-      
+
       let guidedisplay=this.state.guideList.guide.map((guide)=>{
         let title=(
           <p>Title:{guide.title}</p>
@@ -244,12 +243,11 @@ class SingleHero extends Component {
         );
         return (
           <li>
-            <div className="entry">
-              <Panel header={title}  onClick={() => this.setState({ open: !this.state.open })} collapsible expanded={this.state.open}>
-                {content}  
-                {image}
-              </Panel>
-            </div>
+          <div>
+            {title}
+            {content}
+            {image}
+          </div>
           </li>
         );
       });
@@ -359,7 +357,7 @@ class SingleHero extends Component {
 
                                     <FormGroup>
                                     <ControlLabel>Hero Guide Image</ControlLabel>
-                                    <FormControl type="file" onChange={this._handleImageChange} />
+                                    <FormControl type="file" onChange={this._handleImageChange} required/>
                                     {$imagePreview}
                                     </FormGroup>
 
